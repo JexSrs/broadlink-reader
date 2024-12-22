@@ -18,6 +18,10 @@ To get started with Broadlink Reader, clone the repository from GitHub:
 ```
 git clone https://github.com/JexSrs/broadlink-reader.git
 cd broadlink-reader
+
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
 ```
 
 ## Usage

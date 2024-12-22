@@ -1,9 +1,8 @@
+import base64
 from time import sleep
-from broadlink import Device
 
 import broadlink
-import base64
-
+from broadlink import Device
 from colorama import Fore
 
 

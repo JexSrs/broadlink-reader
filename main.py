@@ -1,13 +1,12 @@
-import ipaddress
+import argparse
+import json
+import os
 
 from broadlink import Device
 from colorama import Fore, init
-from utils import get_action_color, print_keys
 
 import bdlk
-import json
-import os
-import argparse
+from utils import print_keys
 
 init(autoreset=True)
 
@@ -22,9 +21,14 @@ def navigate_actions(device: Device, actions):
 
     current_actions = actions
     path = []
+    display_path = []
 
     while True:
-        print("\nChoose an action by index to register:")
+        if display_path:
+            print(Fore.LIGHTBLUE_EX + f'\nCurrent path: {' > '.join(display_path)}')
+        else:
+            print(Fore.LIGHTBLUE_EX + '\nHome Page')
+        print("Choose an action by index to register:")
         print(Fore.WHITE + "-1: " + ("Go back" if path else "Exit"))
         action_keys = print_keys(current_actions)
 
@@ -39,11 +43,22 @@ def navigate_actions(device: Device, actions):
             if path:
                 # Go back one level
                 current_actions = path.pop()
+
+                # Fix "Go back" bug
+                for action in reversed(display_path):
+                    if action in current_actions:
+                        if not isinstance(current_actions[action], dict) and path:
+                            current_actions = path.pop()
+                            display_path.pop()
+
+                display_path.pop()
             else:
                 break
         elif 0 <= choice < len(action_keys):
             # Save current level
             selected_action = action_keys[choice]
+            if selected_action not in display_path:
+                display_path.append(selected_action)
             path.append(current_actions)
 
             # Go deeper into the next level
@@ -77,8 +92,10 @@ def main():
     parser.add_argument('--ip', required=True, help='IP Address of the Broadlink device')
     parser.add_argument('--port', type=int, default=80, help='Port of the Broadlink device (default: 80)')
     parser.add_argument('--timeout', type=int, default=10, help='Timeout for device connection (default: 10)')
-    parser.add_argument('--file', type=str, default='commands.json', help='Output file for saving learned commands (default: commands.json)')
-    parser.add_argument('--read', type=int, default=2, help='Time to wait for the user to send the command (default: 2 seconds)')
+    parser.add_argument('--file', type=str, default='commands.json',
+                        help='Output file for saving learned commands (default: commands.json)')
+    parser.add_argument('--read', type=int, default=2,
+                        help='Time to wait for the user to send the command (default: 2 seconds)')
     args = parser.parse_args()
 
     read_timeout = args.read
