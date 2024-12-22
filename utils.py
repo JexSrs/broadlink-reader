@@ -34,10 +34,45 @@ def get_action_color(current_actions: dict, action: str):
     return Fore.WHITE
 
 
-def print_keys(actions: dict):
+def split_to_chunks(texts, size=5):
+    chunks = [texts[i:i + size] for i in range(0, len(texts), size)]
+    if len(chunks[-1]) < size:
+        chunks[-1].extend([''] * (size - len(chunks[-1])))
+
+    return chunks
+
+
+def insert_pipe(text, index):
+    index += 1
+    if text and len(text) != 0:
+        char_to_insert = "| "
+
+        if index >= len(text):
+            text = text.ljust(index, " ")
+
+        return f'{text[:index] + Fore.MAGENTA + char_to_insert}'
+    return ''
+
+
+def print_keys(actions: dict, max_keys=10):
     keys = list(actions.keys())
+    display_texts = []
+    max_length = -1
     for index, action in enumerate(keys):
         color = get_action_color(actions, action)
-        print(color + f"{index}: {action}{' (select to expand)' if isinstance(actions[action], dict) else ''}")
+        display_text = color + f"{index}: {action}{' (select to expand)' if isinstance(actions[action], dict) else ''}"
+        # Find the largest string when keys >= 10
+        if len(keys) >= max_keys and len(keys) >= max_length:
+            max_length = len(display_text)
+            display_texts.append(display_text)
+        else:
+            print(display_text)
+
+    # Print in 'table' mode
+    if len(keys) >= max_keys:
+        chunks = split_to_chunks(display_texts)
+        for values in zip(*chunks):
+            mapped_values = map(lambda x: insert_pipe(str(x), max_length), values)
+            print("".join(mapped_values))
 
     return keys
