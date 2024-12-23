@@ -60,10 +60,12 @@ def print_keys(actions: dict, max_keys=10):
     max_length = -1
     for index, action in enumerate(keys):
         color = get_action_color(actions, action)
-        display_text = color + f"{index}: {action}{' (select to expand)' if isinstance(actions[action], dict) else ''}"
+        display_text = color + f"{index}: {action}"
         # Find the largest string when keys >= 10
-        if len(keys) >= max_keys and len(keys) >= max_length:
-            max_length = len(display_text)
+        if len(keys) >= max_keys:
+            if len(display_text) >= max_length:
+                max_length = len(display_text)
+
             display_texts.append(display_text)
         else:
             print(display_text)

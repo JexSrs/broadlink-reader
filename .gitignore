@@ -1,2 +1,5 @@
 .idea/
 .venv/
+build/
+dist/
+Broadlink_Reader.egg-info/

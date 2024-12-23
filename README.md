@@ -15,12 +15,17 @@ them to a file for future use.
 
 To get started with Broadlink Reader, clone the repository from GitHub:
 
-```
+```sh
 git clone https://github.com/JexSrs/broadlink-reader.git
 cd broadlink-reader
+```
 
-python -m venv .venv
-source .venv/bin/activate
+and install the project:
+```sh
+python3 setup.py install
+```
+or
+```sh
 pip install -r requirements.txt
 ```
 
@@ -29,7 +34,7 @@ pip install -r requirements.txt
 You can run the Broadlink Reader using the `main.py` script. The following options are available to customize your
 interaction with the Broadlink device:
 
-```
+```sh
 python main.py --ip 192.168.1.100 # Remote's IP address
 ```
 

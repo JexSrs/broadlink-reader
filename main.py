@@ -5,8 +5,8 @@ import os
 from broadlink import Device
 from colorama import Fore, init
 
-import bdlk
-from utils import print_keys
+import remote
+from cli_utils import print_keys
 
 init(autoreset=True)
 
@@ -16,23 +16,20 @@ read_timeout = 2
 
 
 def navigate_actions(device: Device, actions):
-    """Navigate through the nested actions."""
-    global read_timeout
-
-    current_actions = actions
-    path = []
-    display_path = []
-
+    current_path = []
     while True:
-        if display_path:
-            print(Fore.LIGHTBLUE_EX + f'\nCurrent path: {' > '.join(display_path)}')
+        if current_path:
+            print(Fore.LIGHTBLUE_EX + f'\nCurrent path: {' > '.join(current_path)}')
         else:
-            print(Fore.LIGHTBLUE_EX + '\nHome Page')
+            print(Fore.LIGHTBLUE_EX + '\nCurrent path: Home')
         print("Choose an action by index to register:")
-        print(Fore.WHITE + "-1: " + ("Go back" if path else "Exit"))
-        action_keys = print_keys(current_actions)
+        print(Fore.WHITE + "-1: " + ("Go back" if current_path else "Exit"))
 
-        choice = -1
+        curr_actions = actions
+        for path in current_path:
+            curr_actions = curr_actions[path]
+        action_keys = print_keys(curr_actions)
+
         try:
             choice = int(input("> "))
         except ValueError:
@@ -40,41 +37,25 @@ def navigate_actions(device: Device, actions):
             continue
 
         if choice == -1:
-            if path:
+            if current_path:
                 # Go back one level
-                current_actions = path.pop()
-
-                # Fix "Go back" bug
-                for action in reversed(display_path):
-                    if action in current_actions:
-                        if not isinstance(current_actions[action], dict) and path:
-                            current_actions = path.pop()
-                            display_path.pop()
-
-                display_path.pop()
+                current_path.pop()
             else:
                 break
         elif 0 <= choice < len(action_keys):
-            # Save current level
             selected_action = action_keys[choice]
-            if selected_action not in display_path:
-                display_path.append(selected_action)
-            path.append(current_actions)
-
-            # Go deeper into the next level
-            if isinstance(current_actions[selected_action], dict):
-                current_actions = current_actions[selected_action]
+            if isinstance(curr_actions[selected_action], dict):
+                current_path.append(selected_action)
             else:
                 # If it's a leaf and read the packet
                 try:
-                    packet = bdlk.handle_action(device, read_timeout)
+                    packet = remote.handle_action(device, read_timeout)
                 except Exception as e:
                     print(Fore.RED + 'Failed to read from remote: ' + str(e))
                     continue
 
                 # Save the packet in the nested structure
-                parent_action = path[-1] if path else actions
-                parent_action[selected_action] = packet
+                curr_actions[selected_action] = packet
 
                 # Save the updated data back to the output file
                 with open(mFile, 'w') as file:
@@ -99,10 +80,8 @@ def main():
     args = parser.parse_args()
 
     read_timeout = args.read
-    data = {}
-
-    # Load existing data from the input file if it exists
     mFile = args.file
+    # Load existing data from the input file if it exists
     if os.path.exists(mFile):
         with open(mFile, 'r') as f:
             try:
@@ -111,7 +90,7 @@ def main():
                 print(Fore.WHITE + "Could not read input file. Starting with empty data.")
 
     # Setup code
-    device = bdlk.get_device(ip_address=args.ip, port=args.port, timeout=args.timeout)
+    device = remote.get_device(ip_address=args.ip, port=args.port, timeout=args.timeout)
     if not device:
         exit(1)
 
