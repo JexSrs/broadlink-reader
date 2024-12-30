@@ -1,25 +1,25 @@
 import argparse
 import json
 import os
+import remote
 
 from broadlink import Device
 from colorama import Fore, init
-
-import remote
 from cli_utils import print_keys
 
 init(autoreset=True)
 
 data = {}
-mFile = 'commands.json'
+mFile = './commands.json'
 read_timeout = 2
+read_type = 'ir'
 
 
 def navigate_actions(device: Device, actions):
     current_path = []
     while True:
         if current_path:
-            print(Fore.LIGHTBLUE_EX + f'\nCurrent path: {' > '.join(current_path)}')
+            print(Fore.LIGHTBLUE_EX + '\nCurrent path: ' + (' > '.join(current_path)))
         else:
             print(Fore.LIGHTBLUE_EX + '\nCurrent path: Home')
         print("Choose an action by index to register:")
@@ -49,7 +49,7 @@ def navigate_actions(device: Device, actions):
             else:
                 # If it's a leaf and read the packet
                 try:
-                    packet = remote.handle_action(device, read_timeout)
+                    packet = remote.read_action(device, read_type, read_timeout)
                 except Exception as e:
                     print(Fore.RED + 'Failed to read from remote: ' + str(e))
                     continue
@@ -67,19 +67,19 @@ def navigate_actions(device: Device, actions):
 
 
 def main():
-    global data, mFile, read_timeout
+    global data, mFile, read_timeout, read_type
 
     parser = argparse.ArgumentParser(description='Broadlink Device Command Learning')
     parser.add_argument('--ip', required=True, help='IP Address of the Broadlink device')
     parser.add_argument('--port', type=int, default=80, help='Port of the Broadlink device (default: 80)')
-    parser.add_argument('--timeout', type=int, default=10, help='Timeout for device connection (default: 10)')
-    parser.add_argument('--file', type=str, default='commands.json',
-                        help='Output file for saving learned commands (default: commands.json)')
-    parser.add_argument('--read', type=int, default=2,
-                        help='Time to wait for the user to send the command (default: 2 seconds)')
+    parser.add_argument('--timeout', type=int, default=10, help='Timeout (in seconds) for device connection (default: 10)')
+    parser.add_argument('--type', type=str, default='ir', choices=['ir', 'rf'], help='Specify the capture type: "ir" or "rf" (default: ir)')
+    parser.add_argument('--file', type=str, default='./commands.json', help='Output file for saving learned commands (default: ./commands.json)')
+    parser.add_argument('--read', type=int, default=2, help='Time to wait (in seconds) for the user to send the command (default: 2)')
     args = parser.parse_args()
 
     read_timeout = args.read
+    read_type = args.type
     mFile = args.file
     # Load existing data from the input file if it exists
     if os.path.exists(mFile):
