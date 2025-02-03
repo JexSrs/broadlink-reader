@@ -8,7 +8,7 @@ name: Mark stale issues and pull requests
 on:
   workflow_dispatch:
   schedule:
-  - cron: '*/5 * * * *'
+    - cron: '*/5 * * * *'
 
 jobs:
   stale:
@@ -17,8 +17,8 @@ jobs:
       issues: write
       pull-requests: write
     steps:
-    - uses: actions/stale@v9
-      with:
+      - uses: actions/stale@v9
+        with:
           days-before-issue-stale: 30
           days-before-issue-close: 14
           stale-issue-label: "stale"
