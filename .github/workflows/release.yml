@@ -1,9 +1,9 @@
-name: Release
+name: BUild & Release
 
-on:
-  push:
-    tags:
-      - 'v*.*.*'
+#on:
+#  push:
+#    tags:
+#      - 'v*.*.*'
 
 permissions:
   contents: write
@@ -40,7 +40,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ github.ref }}
-          release_name: Release ${{ env.IMAGE_TAG }}
+          release_name: Release ${{ github.ref }}
           body: This is an automated release, wait for the change log to be updated
           draft: false
           prerelease: false
