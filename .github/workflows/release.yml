@@ -10,7 +10,7 @@ permissions:
   actions: write
 
 jobs:
-  build:
+  build-release:
     name: Build python code
     runs-on: ubuntu-latest
     steps:
@@ -32,17 +32,6 @@ jobs:
         run: |
           pyinstaller --onefile src/reader.py
           pyinstaller --onefile src/writer.py
-
-  release:
-    name: Create release
-    needs: [ build ]
-    runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/v')
-    env:
-      IMAGE_TAG: ${{ needs.variables.outputs.IMAGE_TAG }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
 
       - name: Create Release
         id: create_release
