@@ -6,11 +6,12 @@ on:
       - 'v*.*.*'
 
 permissions:
-  contents: read
+  contents: write
+  actions: write
 
 jobs:
   build:
-    name: Build docker image
+    name: Build python code
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
