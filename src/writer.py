@@ -2,7 +2,7 @@ import argparse
 
 from colorama import Fore
 
-from file_generator import FileGenerator
+from utils.file_generator import FileGenerator
 
 
 def main():

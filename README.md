@@ -32,7 +32,7 @@ You can run the Broadlink Reader using the `reader.py` script. The following opt
 interaction with the Broadlink device:
 
 ```sh
-python reader.py --ip 192.168.1.100 # Remote's IP address
+python src/reader.py --ip 192.168.1.100 # Remote's IP address
 ```
 
 ### Options
@@ -56,7 +56,7 @@ You can run the Broadlink Writer using the `writer.py` script. The following opt
 `commands.json` file:
 
 ```sh
-python writer.py --name commands.json --min-temp 17 --max-temp 30 --precision 1 --operations cool heat auto --fan low high auto
+python src/writer.py --name commands.json --min-temp 17 --max-temp 30 --precision 1 --operations cool heat auto --fan low high auto
 ```
 
 ### Options

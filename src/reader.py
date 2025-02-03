@@ -5,8 +5,8 @@ import os
 from broadlink import Device
 from colorama import Fore, init
 
-import remote
-from cli_utils import print_keys
+from remotes import remote
+from utils.cli import print_keys
 
 init(autoreset=True)
 
