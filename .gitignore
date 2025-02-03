@@ -3,3 +3,5 @@
 build/
 dist/
 Broadlink_Reader.egg-info/
+*.spec
+__pycache__/

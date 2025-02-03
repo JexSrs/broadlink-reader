@@ -71,6 +71,16 @@ python src/writer.py --name commands.json --min-temp 17 --max-temp 30 --precisio
 | `--fan <fan>`       | No       | `["auto", "low", "mid", "high"]`              | Specify the fan speed levels.                              |
 | `--name <filename>` | No       | `./commands.json`                             | Specify the output file.                                   |
 
+## Development
+
+### Create executables
+
+1. Install PyInstaller: `pip install pyinstaller`
+2. Build
+   1. Reader: `pyinstaller --onefile src/reader.py`
+   2. Writer: `pyinstaller --onefile src/writer.py`
+3. Executable files will be created under dist directory
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a pull request or open an issue if you have any ideas, feature

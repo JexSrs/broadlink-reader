@@ -6,10 +6,11 @@ from colorama import Fore
 class FileGenerator:
     def __init__(self, args):
         self._required_args = {
-            # Max MUST be grater than min
-            "min_temp": lambda x: isinstance(x, float) and x >= 0,
-            "max_temp": lambda x: isinstance(x, float) and x >= 0,
-            "precision": lambda x: isinstance(x, float) and x > 0,
+            # TODO: max-temp must be grater than min-temp
+            # TODO: precision <= (max-temp - min-temp)
+            "min_temp": lambda x: (isinstance(x, float) or isinstance(x, int)) and x >= 0,
+            "max_temp": lambda x: (isinstance(x, float) or isinstance(x, int)) and x >= 0,
+            "precision": lambda x: (isinstance(x, float) or isinstance(x, int)) and x > 0,
             "operations": lambda x: isinstance(x, list) and bool(x),
             "fan": lambda x: isinstance(x, list) and bool(x),
         }
@@ -31,7 +32,8 @@ class FileGenerator:
         for arg, validate in self._required_args.items():
             value = self._args.get(arg)
             if not validate(value):
-                raise ValueError(f"Invalid value for --{arg}: {value}")
+                arg_name = arg.replace('_', '-')
+                raise ValueError(f"Invalid value for --{arg_name}: {value}")
 
         return True
 
@@ -65,7 +67,6 @@ class FileGenerator:
                     data["commands"][operation][fan_mode][formatted_temp] = ''
                     i += self._args.get("precision")
 
-        # WHEN PRECISION IS INT, DONT PRINT .0 (+min, max)
         with open(self._file_name, "w") as file:
             json.dump(data, file, indent=4)
             print(Fore.GREEN + f'Successfully created "{self._file_name}"!')
